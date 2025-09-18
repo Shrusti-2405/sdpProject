@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const inventoryController = require('../controllers/inventoryController');
 
-// GET /api/inventory - Get all items
+// GET /api/inventory - Get all items (with optional query parameters)
 router.get('/', inventoryController.getAllItems);
+
+// GET /api/inventory/stats - Get dashboard statistics
+router.get('/stats', inventoryController.getDashboardStats);
 
 // GET /api/inventory/search?q=query - Search items
 router.get('/search', inventoryController.searchItems);

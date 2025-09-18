@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="container">
         <Link className="navbar-brand" to="/">
           <i className="bi bi-house-heart me-2"></i>
-          Kitchen Inventory
+          RecipeMate
         </Link>
         
         <button 

@@ -1,10 +1,31 @@
-const inventoryModel = require('../models/inventoryModel');
+const InventoryItem = require('../models/inventoryModel');
 
 class InventoryController {
   // Get all inventory items
-  getAllItems(req, res) {
+  async getAllItems(req, res) {
     try {
-      const items = inventoryModel.getAllItems();
+      const { category, search, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+      
+      // Build query
+      let query = {};
+      
+      if (category) {
+        query.category = category;
+      }
+      
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { category: { $regex: search, $options: 'i' } }
+        ];
+      }
+      
+      // Build sort object
+      const sort = {};
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+      
+      const items = await InventoryItem.find(query).sort(sort);
+      
       res.status(200).json({
         success: true,
         data: items,
@@ -20,10 +41,10 @@ class InventoryController {
   }
 
   // Get single item by ID
-  getItemById(req, res) {
+  async getItemById(req, res) {
     try {
       const { id } = req.params;
-      const item = inventoryModel.getItemById(id);
+      const item = await InventoryItem.findById(id);
       
       if (!item) {
         return res.status(404).json({
@@ -37,6 +58,13 @@ class InventoryController {
         data: item
       });
     } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid item ID'
+        });
+      }
+      
       res.status(500).json({
         success: false,
         message: 'Error fetching item',
@@ -46,7 +74,7 @@ class InventoryController {
   }
 
   // Create new item
-  createItem(req, res) {
+  async createItem(req, res) {
     try {
       const { name, quantity, unit, category, expiryDate } = req.body;
 
@@ -58,20 +86,31 @@ class InventoryController {
         });
       }
 
-      const newItem = inventoryModel.createItem({
-        name,
+      const newItem = new InventoryItem({
+        name: name.trim(),
         quantity: parseFloat(quantity),
         unit,
         category,
-        expiryDate
+        expiryDate: expiryDate ? new Date(expiryDate) : null
       });
+
+      const savedItem = await newItem.save();
 
       res.status(201).json({
         success: true,
-        data: newItem,
+        data: savedItem,
         message: 'Item created successfully'
       });
     } catch (error) {
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors
+        });
+      }
+      
       res.status(500).json({
         success: false,
         message: 'Error creating item',
@@ -81,17 +120,34 @@ class InventoryController {
   }
 
   // Update item
-  updateItem(req, res) {
+  async updateItem(req, res) {
     try {
       const { id } = req.params;
-      const updateData = req.body;
+      const updateData = { ...req.body };
 
       // Convert quantity to number if provided
       if (updateData.quantity) {
         updateData.quantity = parseFloat(updateData.quantity);
       }
 
-      const updatedItem = inventoryModel.updateItem(id, updateData);
+      // Convert expiryDate if provided
+      if (updateData.expiryDate) {
+        updateData.expiryDate = new Date(updateData.expiryDate);
+      }
+
+      // Trim name if provided
+      if (updateData.name) {
+        updateData.name = updateData.name.trim();
+      }
+
+      const updatedItem = await InventoryItem.findByIdAndUpdate(
+        id, 
+        updateData, 
+        { 
+          new: true, // Return the updated document
+          runValidators: true // Run schema validators
+        }
+      );
 
       if (!updatedItem) {
         return res.status(404).json({
@@ -106,6 +162,22 @@ class InventoryController {
         message: 'Item updated successfully'
       });
     } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid item ID'
+        });
+      }
+      
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors
+        });
+      }
+      
       res.status(500).json({
         success: false,
         message: 'Error updating item',
@@ -115,12 +187,12 @@ class InventoryController {
   }
 
   // Delete item
-  deleteItem(req, res) {
+  async deleteItem(req, res) {
     try {
       const { id } = req.params;
-      const deleted = inventoryModel.deleteItem(id);
+      const deletedItem = await InventoryItem.findByIdAndDelete(id);
 
-      if (!deleted) {
+      if (!deletedItem) {
         return res.status(404).json({
           success: false,
           message: 'Item not found'
@@ -129,9 +201,17 @@ class InventoryController {
 
       res.status(200).json({
         success: true,
-        message: 'Item deleted successfully'
+        message: 'Item deleted successfully',
+        data: deletedItem
       });
     } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid item ID'
+        });
+      }
+      
       res.status(500).json({
         success: false,
         message: 'Error deleting item',
@@ -141,7 +221,7 @@ class InventoryController {
   }
 
   // Search items
-  searchItems(req, res) {
+  async searchItems(req, res) {
     try {
       const { q } = req.query;
       
@@ -152,7 +232,7 @@ class InventoryController {
         });
       }
 
-      const items = inventoryModel.searchItems(q);
+      const items = await InventoryItem.searchItems(q);
       
       res.status(200).json({
         success: true,
@@ -169,10 +249,10 @@ class InventoryController {
   }
 
   // Get items by category
-  getItemsByCategory(req, res) {
+  async getItemsByCategory(req, res) {
     try {
       const { category } = req.params;
-      const items = inventoryModel.getItemsByCategory(category);
+      const items = await InventoryItem.findByCategory(category);
       
       res.status(200).json({
         success: true,
@@ -183,6 +263,34 @@ class InventoryController {
       res.status(500).json({
         success: false,
         message: 'Error fetching items by category',
+        error: error.message
+      });
+    }
+  }
+
+  // Get dashboard stats
+  async getDashboardStats(req, res) {
+    try {
+      const totalItems = await InventoryItem.countDocuments();
+      const categories = await InventoryItem.distinct('category');
+      const lowStockItems = await InventoryItem.findLowStock();
+      const expiringSoonItems = await InventoryItem.findExpiringSoon();
+      
+      res.status(200).json({
+        success: true,
+        data: {
+          totalItems,
+          totalCategories: categories.length,
+          lowStockCount: lowStockItems.length,
+          expiringSoonCount: expiringSoonItems.length,
+          lowStockItems,
+          expiringSoonItems
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching dashboard stats',
         error: error.message
       });
     }
