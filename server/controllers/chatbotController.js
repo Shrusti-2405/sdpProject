@@ -1,5 +1,52 @@
 const axios = require('axios');
 
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
+const OPENWEBUI_API_URL = process.env.OPENWEBUI_API_URL;
+const OPENWEBUI_API_KEY = process.env.OPENWEBUI_API_KEY;
+
+async function sendChat(messages, { max_tokens = 800, temperature = 0.5 } = {}) {
+  // Prefer OpenRouter if key present
+  if (OPENROUTER_API_KEY) {
+    const payload = {
+      model: OPENROUTER_MODEL,
+      messages,
+      max_tokens,
+      temperature
+    };
+    const headers = {
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      // Helpful (optional) headers recommended by OpenRouter
+      'HTTP-Referer': 'http://localhost:3000',
+      'X-Title': 'Hospital Equipment Tracker'
+    };
+    const response = await axios.post(OPENROUTER_API_URL, payload, { headers, timeout: 30000 });
+    const choice = response.data?.choices?.[0]?.message?.content || '';
+    return choice;
+  }
+
+  // Optional: OpenWebUI self-hosted compat
+  if (OPENWEBUI_API_URL && OPENWEBUI_API_KEY) {
+    const payload = {
+      model: 'gpt-4o-mini',
+      messages,
+      max_tokens,
+      temperature
+    };
+    const headers = {
+      'Authorization': `Bearer ${OPENWEBUI_API_KEY}`,
+      'Content-Type': 'application/json'
+    };
+    const response = await axios.post(OPENWEBUI_API_URL, payload, { headers, timeout: 30000 });
+    const choice = response.data?.choices?.[0]?.message?.content || '';
+    return choice;
+  }
+
+  throw new Error('No LLM provider configured. Set OPENROUTER_API_KEY or OPENWEBUI_API_URL + OPENWEBUI_API_KEY');
+}
+
 class ChatbotController {
   // Chat with maintenance bot
   async chatWithBot(req, res) {
@@ -35,32 +82,12 @@ Always provide helpful, accurate, and professional responses. If you need specif
         systemPrompt += `\n\nCurrent maintenance context: Maintenance ID ${maintenanceId}`;
       }
 
-      // Prepare the request to OpenAI
-      const openaiRequest = {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user",
-            content: message
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
-      };
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ];
 
-      // Make request to OpenAI API
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', openaiRequest, {
-        headers: {
-          'Authorization': 'Bearer sk-bf725748416143d88b7ea444d68f0c90',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const botResponse = response.data.choices[0].message.content;
+      const botResponse = await sendChat(messages, { max_tokens: 500, temperature: 0.7 });
 
       res.status(200).json({
         success: true,
@@ -73,18 +100,14 @@ Always provide helpful, accurate, and professional responses. If you need specif
       });
 
     } catch (error) {
-      console.error('Chatbot error:', error);
-      
-      // Fallback response if OpenAI API fails
-      const fallbackResponse = "I'm sorry, I'm having trouble connecting to my maintenance knowledge base right now. Please try again in a moment, or contact your maintenance supervisor for immediate assistance.";
-      
-      res.status(200).json({
-        success: true,
-        data: {
-          message: fallbackResponse,
-          timestamp: new Date(),
-          isFallback: true
-        }
+      const reason = error?.response?.data || error?.message || 'unknown error';
+      console.error('Chatbot error:', reason);
+
+      // Return an error to the client so UI can show it clearly
+      return res.status(502).json({
+        success: false,
+        message: 'Chat service is unavailable right now.',
+        error: typeof reason === 'string' ? reason : JSON.stringify(reason)
       });
     }
   }
@@ -118,30 +141,12 @@ Always provide helpful, accurate, and professional responses. If you need specif
       4. When to contact a technician
       5. Common causes and solutions`;
 
-      const openaiRequest = {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a hospital equipment maintenance expert. Provide detailed, professional maintenance guidance."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 800,
-        temperature: 0.5
-      };
+      const messages = [
+        { role: 'system', content: 'You are a hospital equipment maintenance expert. Provide detailed, professional maintenance guidance.' },
+        { role: 'user', content: prompt }
+      ];
 
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', openaiRequest, {
-        headers: {
-          'Authorization': 'Bearer sk-bf725748416143d88b7ea444d68f0c90',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const suggestions = response.data.choices[0].message.content;
+      const suggestions = await sendChat(messages, { max_tokens: 800, temperature: 0.5 });
 
       res.status(200).json({
         success: true,
@@ -155,13 +160,8 @@ Always provide helpful, accurate, and professional responses. If you need specif
       });
 
     } catch (error) {
-      console.error('Maintenance suggestions error:', error);
-      
-      res.status(500).json({
-        success: false,
-        message: 'Error generating maintenance suggestions',
-        error: error.message
-      });
+      console.error('Maintenance suggestions error:', error?.response?.data || error?.message);
+      res.status(502).json({ success: false, message: 'Chat service unavailable', error: error?.message });
     }
   }
 
@@ -186,30 +186,12 @@ Please include:
 4. Common solutions
 5. Preventive measures`;
 
-      const openaiRequest = {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a hospital equipment troubleshooting expert. Provide clear, safe, and systematic troubleshooting guidance."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.3
-      };
+      const messages = [
+        { role: 'system', content: 'You are a hospital equipment troubleshooting expert. Provide clear, safe, and systematic troubleshooting guidance.' },
+        { role: 'user', content: prompt }
+      ];
 
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', openaiRequest, {
-        headers: {
-          'Authorization': 'Bearer sk-bf725748416143d88b7ea444d68f0c90',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const guide = response.data.choices[0].message.content;
+      const guide = await sendChat(messages, { max_tokens: 1000, temperature: 0.3 });
 
       res.status(200).json({
         success: true,
@@ -222,13 +204,8 @@ Please include:
       });
 
     } catch (error) {
-      console.error('Troubleshooting guide error:', error);
-      
-      res.status(500).json({
-        success: false,
-        message: 'Error generating troubleshooting guide',
-        error: error.message
-      });
+      console.error('Troubleshooting guide error:', error?.response?.data || error?.message);
+      res.status(502).json({ success: false, message: 'Chat service unavailable', error: error?.message });
     }
   }
 
@@ -261,30 +238,12 @@ Please include:
       4. Warning signs to watch for
       5. Documentation requirements`;
 
-      const openaiRequest = {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a hospital equipment maintenance scheduling expert. Provide comprehensive maintenance scheduling recommendations."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.4
-      };
+      const messages = [
+        { role: 'system', content: 'You are a hospital equipment maintenance scheduling expert. Provide comprehensive maintenance scheduling recommendations.' },
+        { role: 'user', content: prompt }
+      ];
 
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', openaiRequest, {
-        headers: {
-          'Authorization': 'Bearer sk-bf725748416143d88b7ea444d68f0c90',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const recommendations = response.data.choices[0].message.content;
+      const recommendations = await sendChat(messages, { max_tokens: 1000, temperature: 0.4 });
 
       res.status(200).json({
         success: true,
@@ -298,13 +257,8 @@ Please include:
       });
 
     } catch (error) {
-      console.error('Maintenance schedule recommendations error:', error);
-      
-      res.status(500).json({
-        success: false,
-        message: 'Error generating maintenance schedule recommendations',
-        error: error.message
-      });
+      console.error('Maintenance schedule recommendations error:', error?.response?.data || error?.message);
+      res.status(502).json({ success: false, message: 'Chat service unavailable', error: error?.message });
     }
   }
 
@@ -334,30 +288,12 @@ Please include:
       5. Post-maintenance safety verification
       6. Staff training requirements`;
 
-      const openaiRequest = {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a hospital safety expert. Provide comprehensive safety protocols for equipment maintenance."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.2
-      };
+      const messages = [
+        { role: 'system', content: 'You are a hospital safety expert. Provide comprehensive safety protocols for equipment maintenance.' },
+        { role: 'user', content: prompt }
+      ];
 
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', openaiRequest, {
-        headers: {
-          'Authorization': 'Bearer sk-bf725748416143d88b7ea444d68f0c90',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const protocols = response.data.choices[0].message.content;
+      const protocols = await sendChat(messages, { max_tokens: 1000, temperature: 0.2 });
 
       res.status(200).json({
         success: true,
@@ -370,13 +306,8 @@ Please include:
       });
 
     } catch (error) {
-      console.error('Safety protocols error:', error);
-      
-      res.status(500).json({
-        success: false,
-        message: 'Error generating safety protocols',
-        error: error.message
-      });
+      console.error('Safety protocols error:', error?.response?.data || error?.message);
+      res.status(502).json({ success: false, message: 'Chat service unavailable', error: error?.message });
     }
   }
 }

@@ -49,6 +49,7 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.1);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   animation: fadeInUp 0.6s ease-out;
+  color: #2c3e50;
 }
 
 .card:hover {
@@ -125,6 +126,7 @@
   overflow: hidden;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
+  color: #2c3e50;
 }
 
 .table thead th {
@@ -144,6 +146,7 @@
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
   transform: scale(1.01);
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  color: #2c3e50;
 }
 
 /* Animated Badges */
@@ -166,6 +169,7 @@
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
+  color: #2c3e50;
 }
 
 .form-control:focus, .form-select:focus {
@@ -279,7 +283,7 @@
 
 .chat-message.bot {
   background: rgba(255, 255, 255, 0.9);
-  color: #333;
+  color: #2c3e50;
   margin-right: auto;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   border: 1px solid rgba(102, 126, 234, 0.2);
@@ -505,6 +509,121 @@
   background-clip: text;
 }
 
+/* Enhanced Text Visibility */
+.card-body {
+  color: #2c3e50;
+}
+
+.card-title {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+p, span, div {
+  color: #2c3e50;
+}
+
+/* Ensure proper text contrast on all backgrounds */
+.bg-white, .bg-light {
+  color: #2c3e50 !important;
+}
+
+/* Global contrast improvements */
+.navbar.navbar-dark .navbar-brand,
+.navbar.navbar-dark .nav-link {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar.navbar-dark .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Ensure readable text on gradient headers */
+.card-header,
+.jumbotron,
+.card.text-white .card-body,
+.card.text-white .card-title,
+.card.text-white .card-text {
+  color: #ffffff !important;
+}
+
+/* Table text and header contrast */
+.table thead th {
+  color: #ffffff !important;
+}
+
+.table tbody td,
+.table tbody th {
+  color: #1f2937;
+}
+
+/* Links */
+a,
+.btn-link {
+  color: #334155;
+}
+
+a:hover,
+.btn-link:hover {
+  color: #1e293b;
+}
+
+/* Form labels and placeholders */
+label.form-label {
+  color: #1f2937;
+}
+
+::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+/* Badges: ensure text contrast on bright backgrounds */
+.badge.bg-success,
+.badge.bg-info,
+.badge.bg-warning,
+.badge.bg-danger,
+.badge.bg-primary,
+.badge.bg-secondary {
+  color: #ffffff;
+}
+
+/* Buttons: ensure readable text */
+.btn,
+.btn:hover,
+.btn:focus {
+  color: #ffffff;
+}
+
+/* Dark Mode adjustments for readability */
+@media (prefers-color-scheme: dark) {
+  body, .App {
+    color: #e5e7eb;
+  }
+  .card,
+  .table,
+  .form-control,
+  .form-select {
+    color: #f1f5f9;
+  }
+  label.form-label {
+    color: #e5e7eb;
+  }
+  ::placeholder {
+    color: #cbd5e1;
+  }
+}
+
 .glass-effect {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -642,4 +761,226 @@
   0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
   40% { transform: translateY(-10px); }
   60% { transform: translateY(-5px); }
+}
+
+/* ================================
+   Light Theme Overrides for clarity
+   ================================ */
+
+/* Softer app background for better legibility */
+body, .App { background: #f7f8fa !important; color: #0f172a; }
+
+/* Solid navbar for maximum contrast */
+.navbar, .navbar.navbar-dark, .navbar.bg-primary {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.navbar-brand { color: #0f172a !important; text-shadow: none; }
+.nav-link { color: #374151 !important; }
+.nav-link:hover { color: #111827 !important; transform: none; }
+.nav-link.active { color: #0f172a !important; background: #eaf2ff; border-radius: 6px; }
+
+/* Hero/Jumbotron with bright background and bold headline */
+.jumbotron { 
+  background: #ffffff !important; 
+  color: #0f172a !important; 
+  border: 1px solid #e5e7eb; 
+  border-radius: 14px; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+.jumbotron::before { content: none !important; }
+.jumbotron h1 { color: #0b1324; font-weight: 800; letter-spacing: 0.2px; }
+.jumbotron p { color: #334155; }
+.jumbotron .d-flex { gap: 12px; flex-wrap: wrap; }
+
+/* Buttons in hero: clear contrast */
+.btn-light { color: #0f172a !important; background: #ffffff !important; border: 1px solid #d1d5db !important; }
+.btn-outline-light { color: #0f172a !important; border: 1px solid #d1d5db !important; background: #ffffff !important; }
+
+/* Cards and tiles */
+.card { background: #ffffff !important; color: #1f2937 !important; border: 1px solid #e5e7eb !important; border-radius: 12px !important; }
+.card-header { background: #f8fafc !important; color: #0f172a !important; border-bottom: 1px solid #e5e7eb !important; }
+
+/* The colored statistic tiles switched to soft tints with dark text */
+.card.text-white.bg-primary, .card.text-white.bg-info, .card.text-white.bg-success,
+.card.text-white.bg-warning, .card.text-white.bg-danger, .card.text-white.bg-secondary {
+  color: #0f172a !important; border: 1px solid #e5e7eb !important; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+.card.text-white.bg-primary { background: #e8f0fe !important; }
+.card.text-white.bg-info { background: #e0f2fe !important; }
+.card.text-white.bg-success { background: #e8f5e9 !important; }
+.card.text-white.bg-warning { background: #fef3c7 !important; }
+.card.text-white.bg-danger { background: #fee2e2 !important; }
+.card.text-white.bg-secondary { background: #f3f4f6 !important; }
+
+/* Tables */
+.table { background: #ffffff !important; color: #1f2937 !important; }
+.table thead th { background: #f1f5f9 !important; color: #0f172a !important; border-bottom: 1px solid #e5e7eb !important; }
+.table tbody tr:hover { background: #f9fafb !important; transform: none; box-shadow: none; }
+
+/* Ensure the rightmost "Actions" header and any forced white headers stay readable */
+.table thead th:last-child,
+.table thead th.text-white {
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+/* Improve table readability */
+.table th, .table td { vertical-align: middle; }
+
+/* Forms */
+.form-control, .form-select { background: #ffffff !important; color: #1f2937 !important; border: 1px solid #d1d5db !important; border-radius: 8px !important; }
+.form-control:focus, .form-select:focus { border-color: #2563eb !important; box-shadow: 0 0 0 0.2rem rgba(37,99,235,0.15) !important; transform: none !important; }
+label.form-label { color: #1f2937 !important; }
+::placeholder { color: #64748b !important; }
+
+/* Minor layout alignment improvements */
+.container-fluid .row > [class*='col-'] { display: block; }
+.card .card-body .table-responsive { width: 100%; }
+
+/* ================================
+   Hybrid Dark x Light Showcase Theme (eye-catching)
+   ================================ */
+
+/* Deep aurora background with subtle vignette */
+body, .App {
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(99,102,241,0.25) 0%, rgba(99,102,241,0) 60%),
+              radial-gradient(1000px 500px at 100% 0%, rgba(34,211,238,0.25) 0%, rgba(34,211,238,0) 55%),
+              linear-gradient(180deg, #0b1220 0%, #111827 100%) !important;
+  color: #e5e7eb;
+}
+
+/* High-contrast, elegant navbar */
+.navbar, .navbar.navbar-dark, .navbar.bg-primary {
+  background: rgba(15, 23, 42, 0.72) !important; /* slate-900 glass */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.45);
+}
+.navbar-brand {
+  color: #f8fafc !important;
+  letter-spacing: 0.3px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+}
+.navbar .nav-link {
+  color: rgba(248,250,252,0.92) !important;
+  letter-spacing: 0.2px;
+  padding: 0.45rem 0.9rem;
+}
+.navbar .nav-link:hover {
+  color: #ffffff !important;
+}
+.navbar .nav-link.active {
+  color: #0b1220 !important;
+  background: linear-gradient(135deg, #818cf8 0%, #22d3ee 100%) !important;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(129,140,248,0.35);
+}
+
+/* Hero card: dark glass with bright headline */
+.jumbotron {
+  background: linear-gradient(180deg, rgba(17,24,39,0.88) 0%, rgba(17,24,39,0.78) 100%) !important;
+  border: 1px solid rgba(148,163,184,0.18) !important;
+  color: #e5e7eb !important;
+}
+.jumbotron h1 { color: #f8fafc; text-shadow: 0 4px 18px rgba(2,6,23,0.45); }
+.jumbotron p { color: #cbd5e1; }
+.jumbotron .btn { box-shadow: 0 8px 24px rgba(2,6,23,0.35); }
+
+/* Cards stay light for contrast on dark bg */
+.card { color: #0f172a !important; }
+.card .card-title, .card .card-text { color: #0f172a; }
+
+/* Pastel stat tiles with sharp text */
+.card.text-white.bg-primary, .card.text-white.bg-info, .card.text-white.bg-success,
+.card.text-white.bg-warning, .card.text-white.bg-danger, .card.text-white.bg-secondary {
+  color: #0b1324 !important;
+}
+
+/* Distinct pastel palettes + bold readable text for stat tiles */
+.card.text-white.bg-primary {
+  background: #dbeafe !important; /* blue-100 */
+  border-left: 6px solid #3b82f6 !important;
+}
+.card.text-white.bg-info {
+  background: #cffafe !important; /* cyan-100 */
+  border-left: 6px solid #06b6d4 !important;
+}
+.card.text-white.bg-success {
+  background: #dcfce7 !important; /* green-100 */
+  border-left: 6px solid #22c55e !important;
+}
+.card.text-white.bg-warning {
+  background: #fef3c7 !important; /* amber-100 */
+  border-left: 6px solid #f59e0b !important;
+}
+.card.text-white.bg-danger {
+  background: #fee2e2 !important; /* red-100 */
+  border-left: 6px solid #ef4444 !important;
+}
+.card.text-white.bg-secondary {
+  background: #e5e7eb !important; /* gray-200 */
+  border-left: 6px solid #64748b !important;
+}
+
+/* Typography inside tiles */
+.card.text-white.bg-primary .card-title,
+.card.text-white.bg-info .card-title,
+.card.text-white.bg-success .card-title,
+.card.text-white.bg-warning .card-title,
+.card.text-white.bg-danger .card-title,
+.card.text-white.bg-secondary .card-title {
+  color: #0b1324 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+}
+.card.text-white.bg-primary h2,
+.card.text-white.bg-info h2,
+.card.text-white.bg-success h2,
+.card.text-white.bg-warning h2,
+.card.text-white.bg-danger h2,
+.card.text-white.bg-secondary h2 {
+  color: #0b1324 !important;
+  font-weight: 800 !important;
+}
+.card.text-white [class^='bi'],
+.card.text-white [class*=' bi'] {
+  color: #0b1324 !important;
+  opacity: 0.8;
+}
+
+/* Buttons pop on dark */
+.btn-primary { background: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%) !important; }
+.btn-info { background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 100%) !important; }
+.btn-success { background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important; }
+.btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important; }
+.btn-danger { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%) !important; }
+
+/* Ensure link visibility on dark */
+a, .btn-link { color: #93c5fd; }
+a:hover, .btn-link:hover { color: #bfdbfe; }
+
+/* Fix dim section titles on dark background (outside cards) */
+.container-fluid > .row > .col-12 > h1,
+.container-fluid > .row > .col-12 > h2,
+.container-fluid > .row > .col-12 > .h1,
+.container-fluid > .row > .col-12 > .h2,
+.container-fluid .d-flex.justify-content-between.align-items-center h2 {
+  background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 60%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px;
+  text-shadow: 0 6px 28px rgba(99,102,241,0.25);
+}
+
+/* Ensure leading icon next to titles is visible */
+.container-fluid > .row > .col-12 > h1 i,
+.container-fluid > .row > .col-12 > h2 i,
+.container-fluid .d-flex.justify-content-between.align-items-center h2 i {
+  color: #eaf2ff !important;
+  opacity: 1;
+  filter: drop-shadow(0 2px 8px rgba(34,211,238,0.25));
 }

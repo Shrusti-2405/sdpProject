@@ -94,7 +94,10 @@ const AddEquipment = () => {
       navigate('/equipment');
     } catch (error) {
       console.error('Error creating equipment:', error);
-      alert('Error creating equipment. Please try again.');
+      const serverMsg = error?.response?.data?.message;
+      const serverErrors = error?.response?.data?.errors;
+      const details = Array.isArray(serverErrors) ? `\n- ${serverErrors.join('\n- ')}` : '';
+      alert(`Error creating equipment: ${serverMsg || error.message}${details}`);
     } finally {
       setLoading(false);
     }
