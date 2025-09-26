@@ -12,8 +12,8 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          <i className="bi bi-house-heart me-2"></i>
-          RecipeMate
+          <i className="bi bi-hospital me-2"></i>
+          Equipment Tracker
         </Link>
         
         <button 
@@ -29,27 +29,32 @@ const Navbar = () => {
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <Link className={isActive('/')} to="/">
-                Home
+                <i className="bi bi-house me-1"></i>
+                Dashboard
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={isActive('/inventory')} to="/inventory">
-                Inventory
+              <Link className={isActive('/equipment')} to="/equipment">
+                <i className="bi bi-gear me-1"></i>
+                Equipment
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={isActive('/add-item')} to="/add-item">
-                Add Item
+              <Link className={isActive('/add-equipment')} to="/add-equipment">
+                <i className="bi bi-plus-circle me-1"></i>
+                Add Equipment
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={isActive('/recipe-suggestions')} to="/recipe-suggestions">
-                Recipe Suggestions
+              <Link className={isActive('/maintenance')} to="/maintenance">
+                <i className="bi bi-tools me-1"></i>
+                Maintenance
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={isActive('/recipe-chat')} to="/recipe-chat">
-                Recipe Chat
+              <Link className={isActive('/maintenance-chat')} to="/maintenance-chat">
+                <i className="bi bi-robot me-1"></i>
+                Maintenance Bot
               </Link>
             </li>
           </ul>

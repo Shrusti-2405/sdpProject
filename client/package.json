@@ -1,7 +1,7 @@
 {
-  "name": "kitchen-inventory-frontend",
+  "name": "hospital-equipment-tracker-frontend",
   "version": "1.0.0",
-  "description": "Kitchen Inventory Management Frontend",
+  "description": "Hospital Equipment Tracker with Maintenance Bot Frontend",
   "main": "src/index.js",
   "scripts": {
     "start": "react-scripts start",
