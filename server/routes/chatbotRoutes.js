@@ -10,4 +10,3 @@ router.post('/schedule-recommendations', chatbotController.getMaintenanceSchedul
 router.post('/safety-protocols', chatbotController.getSafetyProtocols);
 
 module.exports = router;
-``
